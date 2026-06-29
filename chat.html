@@ -3,523 +3,730 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioChatAmigosChile</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>RadioXatAnigosChile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-    
     :root {
-        --bg-dark: #0A0A0B;
-        --bg-card: #121214;
-        --bg-hover: #1a1a1d;
-        --accent: #8b5cf6;
-        --accent-hover: #7c3aed;
-        --accent-glow: rgba(139, 92, 246, 0.3);
-        --text-primary: #f1f5f9;
-        --text-secondary: #94a3b8;
-        --border: #2a2a2f;
-        --success: #10b981;
-        --danger: #ef4444;
+        --bg: #0A0A0B;
+        --bg-secondary: #111114;
+        --glass: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --violet: #7C3AED;
+        --violet-light: #A78BFA;
+        --violet-accent: #8B5CF6;
+        --violet-dark: #6D28D9;
+        --text: #EDEDED;
+        --text-secondary: #A1A1AA;
+        --radius: 16px;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     * {
-        font-family: 'Outfit', sans-serif;
+        margin: 0;
+        padding: 0;
         box-sizing: border-box;
     }
-    
-    .mono {
-        font-family: 'JetBrains Mono', monospace;
+
+    html, body {
+        height: 100%;
+        overflow-x: hidden;
     }
-    
+
     body {
-        background: var(--bg-dark);
-        color: var(--text-primary);
-        overflow: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        position: relative;
     }
-    
-    .glass {
-        background: rgba(18, 18, 20, 0.7);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(139, 92, 246, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+        z-index: -1;
+        animation: gradientMove 15s ease infinite;
     }
-    
-    .glass-strong {
-        background: rgba(18, 18, 20, 0.85);
+
+    @keyframes gradientMove {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(-10%, -10%) rotate(5deg); }
+    }
+
+    .container {
+        display: flex;
+        height: 100vh;
+        gap: 16px;
+        padding: 16px;
+        max-width: 1920px;
+        margin: 0 auto;
+    }
+
+    .panel {
+        background: var(--glass);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(139, 92, 246, 0.25);
-        box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
-    }
-    
-    .irc-window {
-        background: var(--bg-dark);
-    }
-    
-    .irc-header {
-        background: linear-gradient(135deg, #1a1a1d 0%, #0A0A0B 100%);
-        border-bottom: 1px solid var(--border);
-        backdrop-filter: blur(10px);
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-8px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
-        50% { box-shadow: 0 0 35px var(--accent-glow), 0 0 50px var(--accent-glow); }
-    }
-    
-    .connect-btn {
-        background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
-        border: 1px solid rgba(139, 92, 246, 0.4);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: pulse-glow 2.5s ease-in-out infinite;
-    }
-    
-    .connect-btn:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 0 40px var(--accent-glow), 0 8px 24px rgba(139, 92, 246, 0.4);
-    }
-    
-    .connect-btn:active {
-        transform: translateY(0) scale(0.98);
-    }
-    
-    .radio-panel {
-        background: var(--bg-card);
-        border-left: 1px solid var(--border);
-    }
-    
-    .metadata-display {
-        background: rgba(139, 92, 246, 0.05);
-        border: 1px solid rgba(139, 92, 246, 0.15);
-        border-radius: 12px;
-        padding: 16px;
-        transition: all 0.3s ease;
-    }
-    
-    .radio-control-btn {
-        background: var(--bg-hover);
-        border: 1px solid var(--border);
-        color: var(--text-primary);
-        transition: all 0.2s;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-    
-    .radio-control-btn:hover {
-        background: var(--accent);
-        border-color: var(--accent);
-        box-shadow: 0 0 20px var(--accent-glow);
-        transform: translateY(-1px);
-    }
-    
-    .radio-control-btn:active {
-        transform: scale(0.96);
-    }
-    
-    .radio-control-btn.active {
-        background: var(--accent);
-        border-color: var(--accent);
-    }
-    
-    input[type="range"] {
-        -webkit-appearance: none;
-        background: var(--bg-hover);
-        border: 1px solid var(--border);
-        height: 6px;
-        border-radius: 3px;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        background: var(--accent);
-        cursor: pointer;
-        border-radius: 50%;
-        box-shadow: 0 0 12px var(--accent-glow);
-        transition: all 0.2s;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb:hover {
-        transform: scale(1.3);
-    }
-    
-    .equalizer {
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
         display: flex;
-        gap: 3px;
-        height: 20px;
-        align-items: flex-end;
+        flex-direction: column;
+    }
+
+    .panel-left {
+        flex: 0 0 70%;
+        position: relative;
+    }
+
+    .panel-right {
+        flex: 0 0 calc(30% - 16px);
+        padding: 24px;
+        gap: 20px;
+    }
+
+    .chat-header {
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--glass-border);
+        min-height: 80px;
+        gap: 16px;
+        position: relative;
+    }
+
+    .chat-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1;
+    }
+
+    .chat-brand svg {
+        width: 32px;
+        height: 32px;
+        fill: var(--violet-accent);
+        filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.4));
+    }
+
+    .chat-brand-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.5px;
+    }
+
+    .chat-header-center {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 0;
+    }
+
+    .chat-content {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
         justify-content: center;
     }
-    
-    .bar {
-        width: 3px;
-        background: linear-gradient(180deg, var(--accent) 0%, #6366f1 100%);
-        border-radius: 2px;
-        animation: eq 0.8s infinite ease-in-out alternate;
+
+    .chat-placeholder {
+        text-align: center;
+        padding: 40px;
+        opacity: 0.6;
     }
-    
-    .bar:nth-child(1) { animation-delay: 0s; }
-    .bar:nth-child(2) { animation-delay: 0.1s; }
-    .bar:nth-child(3) { animation-delay: 0.2s; }
-    .bar:nth-child(4) { animation-delay: 0.3s; }
-    .bar:nth-child(5) { animation-delay: 0.4s; }
-    
-    @keyframes eq {
-        from { height: 4px; opacity: 0.5; }
-        to { height: 20px; opacity: 1; }
-    }
-    
-    .equalizer.paused .bar {
-        animation-play-state: paused;
-        height: 4px;
+
+    .chat-placeholder svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 16px;
         opacity: 0.3;
     }
-    
-    .chat-area {
-        width: 70%;
+
+    #chatFrame {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: none;
     }
-    
-    .radio-panel {
-        width: 30%;
-        min-width: 300px;
+
+    .btn {
+        background: linear-gradient(135deg, var(--violet) 0%, var(--violet-dark) 100%);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        position: relative;
+        overflow: hidden;
     }
-    
-    @media (max-width: 768px) {
-        .main-layout {
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 30px rgba(124, 58, 237, 0.5);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    .btn-secondary {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(124, 58, 237, 0.1);
+        border-color: var(--violet);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+        box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger:hover {
+        box-shadow: 0 6px 30px rgba(220, 38, 38, 0.5);
+    }
+
+    .section {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .section-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        background: var(--violet-light);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--violet-light);
+    }
+
+    .now-playing {
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .track-artist {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .track-title {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+
+    .loading-dots::after {
+        content: '...';
+        animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+        0%, 20% { content: ''; }
+        40% { content: '.'; }
+        60% { content: '..'; }
+        80%, 100% { content: '...'; }
+    }
+
+    .player-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .play-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--violet) 0%, var(--violet-dark) 100%);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        flex-shrink: 0;
+    }
+
+    .play-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 30px rgba(124, 58, 237, 0.5);
+    }
+
+    .play-btn svg {
+        width: 20px;
+        height: 20px;
+        fill: white;
+    }
+
+    .player-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .player-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .volume-icon {
+        width: 20px;
+        height: 20px;
+        fill: var(--text-secondary);
+        flex-shrink: 0;
+    }
+
+    .volume-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--violet-light);
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        transition: var(--transition);
+    }
+
+    .volume-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+    }
+
+    .volume-slider::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--violet-light);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        transition: var(--transition);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        padding: 12px 16px;
+        background: rgba(124, 58, 237, 0.08);
+        border-radius: 8px;
+        border: 1px solid rgba(124, 58, 237, 0.2);
+    }
+
+    .user-info strong {
+        color: var(--violet-light);
+        font-weight: 600;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @media (max-width: 1024px) {
+        .container {
             flex-direction: column;
         }
-        .chat-area {
-            width: 100% !important;
-            order: 1;
-            min-height: 400px;
+
+        .panel-left {
+            flex: 1 1 auto;
+            min-height: 60vh;
         }
-        .radio-panel {
-            width: 100% !important;
-            border-left: none !important;
-            border-top: 1px solid var(--border);
-            order: 2;
-            max-height: 320px;
-            min-width: unset;
+
+        .panel-right {
+            flex: 0 0 auto;
         }
-        .irc-header h1 {
-            font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 12px;
+            gap: 12px;
+        }
+
+        .panel-right {
+            padding: 16px;
+            gap: 16px;
+        }
+
+        .chat-header {
+            padding: 16px;
+            min-height: 70px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .chat-header-center {
+            position: static;
+            transform: none;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .chat-brand-title {
+            font-size: 18px;
+        }
+
+        .chat-brand svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .section {
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 390px) {
+        .player-controls {
+            gap: 12px;
+        }
+
+        .play-btn {
+            width: 44px;
+            height: 44px;
+        }
+
+        .chat-brand-title {
+            font-size: 16px;
+        }
+
+        .chat-header {
+            gap: 10px;
         }
     }
 </style>
 </head>
-<body class="h-screen flex flex-col">
-    <div class="irc-window flex flex-col h-full">
-        <!-- Header -->
-        <div class="irc-header px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3 .895 3 2zM9 10l12-3"></path>
+<body>
+    <div class="container">
+        <div class="panel panel-left">
+            <div class="chat-header">
+                <div class="chat-brand">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.08 2 11c0 2.06.83 3.94 2.2 5.4L3 22l4.93-2.6C9.11 19.8 10.51 20 12 20c5.52 0 10-4.08 10-9s-4.48-9-10-9zm1 13h-2v-2h2v2zm0-3h-2V7h2v5z"/>
                     </svg>
+                    <span class="chat-brand-title">Chat Amigos Chile</span>
                 </div>
-                <div>
-                    <h1 class="text-sm md:text-base font-bold text-white">Chat Amigos Chile</h1>
-                    <p class="text-xs text-slate-400 mono">Sala #Punto_de_Encuentro</p>
+                <div class="chat-header-center">
+                    <button id="connectBtn" class="btn">Conectar al Chat</button>
                 </div>
             </div>
-            <div class="flex items-center gap-3 text-xs">
-                <div id="connectionStatus" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-slate-700/50">
-                    <div id="connectionDot" class="w-2 h-2 rounded-full bg-slate-500"></div>
-                    <span class="text-slate-300">Desconectado</span>
+            <div class="chat-content" id="chatContent">
+                <div id="chatPlaceholder" class="chat-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    </svg>
+                    <p>Presiona "Conectar" para unirte al chat</p>
                 </div>
+                <iframe id="chatFrame" allowfullscreen></iframe>
             </div>
         </div>
-        
-        <!-- Main Layout -->
-        <div class="main-layout flex flex-1 overflow-hidden">
-            <!-- Chat Area 70% -->
-            <div class="chat-area flex flex-col min-w-0 bg-[#0A0A0B]">
-                <!-- Pre-connect Screen -->
-                <div id="connectScreen" class="flex-1 flex items-center justify-center p-6">
-                    <div class="text-center max-w-md">
-                        <div class="glass-strong rounded-2xl p-8 md:p-10">
-                            <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/50">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                </svg>
-                            </div>
-                            <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">Chat Amigos Chile</h2>
-                            <p class="text-sm text-slate-400 mb-8">Conecta con la comunidad Chat Amigos Chile</p>
-                            <button id="connectBtn" class="connect-btn w-full py-4 px-8 rounded-xl text-white font-bold text-base flex items-center justify-center gap-3">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>
-                                    <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"></path>
-                                </svg>
-                                Conectar al Chat
-                            </button>
-                            <p class="text-xs text-slate-500 mt-4">El chat se cargará al conectar</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Xat Iframe Container - Hidden initially -->
-                <div id="xatContainer" class="flex-1" style="display:none;">
-                    <div class="bg-slate-900/50 px-4 py-2 border-b border-slate-800 text-xs font-semibold flex items-center justify-between">
-                        <span class="text-slate-300 flex items-center gap-2">
-                            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                            Chat Real de xat.com - En línea
-                        </span>
-                        <span class="text-violet-400 mono"></span>
-                    </div>
-                    <div id="xatIframeWrapper" class="h-[calc(100%-32px)]"></div>
+
+        <div class="panel panel-right">
+            <div class="section">
+                <div class="section-title">Usuario</div>
+                <button id="changeNickBtn" class="btn btn-secondary" style="width: 100%;">Cambiar Nick</button>
+                <div id="userInfo" class="user-info hidden" style="margin-top: 12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    <span>Nick: <strong id="currentNick">Anónimo</strong></span>
                 </div>
             </div>
-            
-            <!-- Radio Panel 30% -->
-            <div class="radio-panel flex flex-col overflow-y-auto">
-                <!-- Panel Header -->
-                <div class="px-5 py-4 border-b border-slate-800">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-white">Radio Amigos</div>
-                            <div class="text-xs text-slate-400">En Directo 24/7</div>
-                        </div>
+
+            <div class="section">
+                <div class="section-title">Ahora Suena</div>
+                <div class="now-playing" id="nowPlaying">
+                    <div class="track-artist loading-dots">Cargando</div>
+                    <div class="track-title"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Reproductor</div>
+                <div class="player-controls">
+                    <button class="play-btn" id="playPauseBtn">
+                        <svg id="playIcon" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg id="pauseIcon" viewBox="0 0 24 24" class="hidden">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </button>
+                    <div class="player-info">
+                        <div class="player-title">Radio Amigos</div>
                     </div>
                 </div>
-                
-                <!-- Metadata Display - Sin carátulas -->
-                <div class="p-5">
-                    <div class="metadata-display">
-                        <div class="text-xs text-violet-400 font-bold uppercase tracking-wider mb-3">Ahora Suena</div>
-                        <div id="trackDisplay" class="text-base font-bold text-white leading-snug mb-2 min-h-[24px]">
-                            Conectando...
-                        </div>
-                        <div id="artistDisplay" class="text-sm text-slate-300 mb-3 min-h-[20px]">
-                            Radio Amigos
-                        </div>
-                        
-                        <!-- Visualizer -->
-                        <div class="flex justify-center pt-2">
-                            <div class="equalizer paused" id="equalizer">
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                                <div class="bar"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="volume-control">
+                    <svg class="volume-icon" viewBox="0 0 24 24">
+                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
                 </div>
-                
-                <!-- Controls - Solo Play/Pause + Volumen -->
-                <div class="px-5 pb-5 space-y-4">
-                    <div class="glass rounded-xl p-4">
-                        <!-- Play/Pause -->
-                        <div class="flex gap-2 mb-4">
-                            <button id="playBtn" class="radio-control-btn flex-1 py-3 px-4 text-sm flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-                                </svg>
-                                Play
-                            </button>
-                            <button id="pauseBtn" class="radio-control-btn flex-1 py-3 px-4 text-sm flex items-center justify-center gap-2" style="display:none;">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                                </svg>
-                                Pause
-                            </button>
-                        </div>
-                        
-                        <!-- Volume -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between text-xs text-slate-400">
-                                <span class="flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    Volumen
-                                </span>
-                                <span id="volumeDisplay" class="font-bold text-violet-400">70%</span>
-                            </div>
-                            <input 
-                                type="range" 
-                                id="volumeSlider" 
-                                min="0" 
-                                max="100" 
-                                value="70" 
-                                class="w-full"
-                            >
-                        </div>
-                    </div>
-                    
-                    <!-- Station Info -->
-                    <div class="glass rounded-xl p-4 text-center">
-                        <div class="text-xs text-slate-500 space-y-1">
-                            <div class="flex items-center justify-center gap-2">
-                                <div class="w-1.5 h-1.5 rounded-full bg-violet-500"></div>
-                                <span class="font-semibold text-slate-300">Radio Amigos</span>
-                            </div>
-                            <div class="text-[10px] text-slate-600">@BarT Corporation</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <audio id="radioStream" preload="none">
-                    <source src="https://myradio.live/listen/redamigos/radio.mp3" type="audio/mpeg">
-                </audio>
             </div>
         </div>
     </div>
 
-<script>
-    // Elements
-    const connectBtn = document.getElementById('connectBtn');
-    const connectScreen = document.getElementById('connectScreen');
-    const xatContainer = document.getElementById('xatContainer');
-    const xatIframeWrapper = document.getElementById('xatIframeWrapper');
-    const connectionDot = document.getElementById('connectionDot');
-    const connectionStatus = document.getElementById('connectionStatus');
-    
-    // Radio elements
-    const radioStream = document.getElementById('radioStream');
-    const playBtn = document.getElementById('playBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const volumeSlider = document.getElementById('volumeSlider');
-    const volumeDisplay = document.getElementById('volumeDisplay');
-    const equalizer = document.getElementById('equalizer');
-    const trackDisplay = document.getElementById('trackDisplay');
-    const artistDisplay = document.getElementById('artistDisplay');
-    
-    let isRadioPlaying = false;
-    let metadataInterval = null;
-    let lastTrackId = null;
-    let stationId = 'redamigos';
-    
-    // Connect Button - Load Xat on demand
-    connectBtn.addEventListener('click', () => {
-        connectScreen.style.display = 'none';
-        xatContainer.style.display = 'flex';
-        xatContainer.style.flexDirection = 'column';
+    <audio id="radioPlayer" preload="none">
+        <source src="https://myradio.live/listen/redamigos/radio.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Config
+        const XAT_API_KEY = '2fa67b290170eaaa';
         
-        // Insert iframe only when clicked
-        const iframe = document.createElement('iframe');
-        iframe.src = 'https://xat.com/embed/chat.php#id=220362270&gn=puntodeencuentro2026';
-        iframe.width = '100%';
-        iframe.height = '100%';
-        iframe.frameBorder = '0';
-        iframe.scrolling = 'no';
-        iframe.title = 'Chat de xat.com';
-        xatIframeWrapper.appendChild(iframe);
-        
-        // Update connection status
-        connectionDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
-        connectionStatus.querySelector('span').textContent = 'Conectado';
-        
-        // Auto-start radio when connecting
-        if (!isRadioPlaying) {
-            setTimeout(() => playBtn.click(), 500);
+        const CHAT_CONFIG = {
+            id: '219104257',
+            groupName: 'puntodeencuentro2026'
+        };
+
+        const RADIO_CONFIG = {
+            streamUrl: 'https://myradio.live/listen/redamigos/radio.mp3',
+            apiUrl: 'https://myradio.live/api/nowplaying/redamigos',
+            updateInterval: 20000
+        };
+
+        // State
+        let currentNick = '';
+        let chatConnected = false;
+        let isPlaying = false;
+        let metadataInterval = null;
+
+        // Elements
+        const connectBtn = document.getElementById('connectBtn');
+        const changeNickBtn = document.getElementById('changeNickBtn');
+        const chatFrame = document.getElementById('chatFrame');
+        const chatContent = document.getElementById('chatContent');
+        const chatPlaceholder = document.getElementById('chatPlaceholder');
+        const userInfo = document.getElementById('userInfo');
+        const currentNickEl = document.getElementById('currentNick');
+        const nowPlayingEl = document.getElementById('nowPlaying');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const radioPlayer = document.getElementById('radioPlayer');
+
+        // Chat Functions
+        function buildChatUrl(nick) {
+            return `https://xat.com/embed/chat.php#id=${CHAT_CONFIG.id}&gn=${CHAT_CONFIG.groupName}&user=${encodeURIComponent(nick)}&k=${XAT_API_KEY}`;
         }
-    });
-    
-    // Fetch metadata from myradio.live API
-    async function fetchMetadata() {
-        try {
-            const endpoint = `https://myradio.live/api/nowplaying/${stationId}`;
-            const response = await fetch(endpoint);
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const data = await response.json();
-            updateNowPlaying(data);
-            
-        } catch (error) {
-            console.error('Error fetching metadata:', error);
+
+        function connectChat() {
+            const url = buildChatUrl(currentNick || 'Invitado');
+            chatFrame.src = url;
+            chatFrame.style.display = 'block';
+            chatPlaceholder.style.display = 'none';
+            connectBtn.textContent = 'Desconectar';
+            connectBtn.classList.add('btn-danger');
+            chatConnected = true;
         }
-    }
-    
-    // Update Now Playing - Solo Artista y Título
-    function updateNowPlaying(data) {
-        const song = data.now_playing?.song || data.song || data;
-        const currentId = song?.id || `${song?.artist}-${song?.title}`;
-        
-        if (currentId === lastTrackId) return;
-        lastTrackId = currentId;
-        
-        const artist = song.artist || song.artist_name || 'Artista Desconocido';
-        const title = song.title || song.song_title || song.text || 'Sin título';
-        
-        // Update with fade effect
-        trackDisplay.style.opacity = '0';
-        artistDisplay.style.opacity = '0';
-        
-        setTimeout(() => {
-            trackDisplay.textContent = title;
-            artistDisplay.textContent = artist;
-            trackDisplay.style.opacity = '1';
-            artistDisplay.style.opacity = '1';
-        }, 200);
-    }
-    
-    // Radio Controls
-    function updateRadioUI(playing) {
-        isRadioPlaying = playing;
-        if (playing) {
-            equalizer.classList.remove('paused');
-            playBtn.style.display = 'none';
-            pauseBtn.style.display = 'inline-flex';
-            
-            if (!metadataInterval) {
-                fetchMetadata();
-                metadataInterval = setInterval(fetchMetadata, 20000);
-            }
-        } else {
-            equalizer.classList.add('paused');
-            playBtn.style.display = 'inline-flex';
-            pauseBtn.style.display = 'none';
-            
-            if (metadataInterval) {
-                clearInterval(metadataInterval);
-                metadataInterval = null;
+
+        function disconnectChat() {
+            chatFrame.src = '';
+            chatFrame.style.display = 'none';
+            chatPlaceholder.style.display = 'block';
+            connectBtn.textContent = 'Conectar al Chat';
+            connectBtn.classList.remove('btn-danger');
+            chatConnected = false;
+        }
+
+        function toggleChatConnection() {
+            if (chatConnected) {
+                disconnectChat();
+            } else {
+                connectChat();
             }
         }
-    }
-    
-    playBtn.addEventListener('click', () => {
-        radioStream.play().then(() => {
-            updateRadioUI(true);
-        }).catch(err => {
-            console.error('Error al reproducir:', err);
+
+        function changeNick() {
+            const newNick = prompt('Ingresa tu nuevo nick:', currentNick || '');
+            if (newNick !== null && newNick.trim() !== '') {
+                currentNick = newNick.trim();
+                currentNickEl.textContent = currentNick;
+                userInfo.classList.remove('hidden');
+                
+                if (chatConnected) {
+                    const oldFrame = document.getElementById('chatFrame');
+                    const newFrame = document.createElement('iframe');
+                    newFrame.id = 'chatFrame';
+                    newFrame.allowFullscreen = true;
+                    newFrame.style.width = '100%';
+                    newFrame.style.height = '100%';
+                    newFrame.style.border = 'none';
+                    newFrame.src = buildChatUrl(currentNick);
+                    oldFrame.parentNode.replaceChild(newFrame, oldFrame);
+                }
+            }
+        }
+
+        // Radio Functions
+        function togglePlayPause() {
+            if (isPlaying) {
+                radioPlayer.pause();
+                isPlaying = false;
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            } else {
+                radioPlayer.play().then(() => {
+                    isPlaying = true;
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                }).catch(err => {
+                    console.error('Error al reproducir:', err);
+                });
+            }
+        }
+
+        function updateVolume() {
+            radioPlayer.volume = volumeSlider.value / 100;
+        }
+
+        async function updateNowPlaying() {
+            try {
+                const response = await fetch(RADIO_CONFIG.apiUrl);
+                const data = await response.json();
+                
+                if (data.now_playing && data.now_playing.song) {
+                    const artist = data.now_playing.song.artist || 'Desconocido';
+                    const title = data.now_playing.song.title || 'Sin título';
+                    
+                    nowPlayingEl.innerHTML = `
+                        <div class="track-artist">${escapeHtml(artist)}</div>
+                        <div class="track-title">${escapeHtml(title)}</div>
+                    `;
+                } else {
+                    nowPlayingEl.innerHTML = `
+                        <div class="track-artist">Sin información</div>
+                        <div class="track-title">Radio RedAmigos</div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Error al obtener metadata:', err);
+                nowPlayingEl.innerHTML = `
+                    <div class="track-artist">Error de conexión</div>
+                    <div class="track-title">Reintentando...</div>
+                `;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event Listeners
+        connectBtn.addEventListener('click', toggleChatConnection);
+        changeNickBtn.addEventListener('click', changeNick);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        volumeSlider.addEventListener('input', updateVolume);
+
+        radioPlayer.addEventListener('play', () => {
+            isPlaying = true;
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
         });
-    });
-    
-    pauseBtn.addEventListener('click', () => {
-        radioStream.pause();
-        updateRadioUI(false);
-    });
-    
-    volumeSlider.addEventListener('input', (e) => {
-        const vol = e.target.value;
-        radioStream.volume = vol / 100;
-        volumeDisplay.textContent = vol + '%';
-    });
-    
-    radioStream.volume = 0.7;
-    
-    radioStream.addEventListener('playing', () => updateRadioUI(true));
-    radioStream.addEventListener('pause', () => updateRadioUI(false));
-    radioStream.addEventListener('error', () => updateRadioUI(false));
-    
-    // Smooth transitions
-    trackDisplay.style.transition = 'opacity 0.3s ease';
-    artistDisplay.style.transition = 'opacity 0.3s ease';
-</script>
+
+        radioPlayer.addEventListener('pause', () => {
+            isPlaying = false;
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+        });
+
+        // Init
+        updateVolume();
+        updateNowPlaying();
+        metadataInterval = setInterval(updateNowPlaying, RADIO_CONFIG.updateInterval);
+
+        // Cleanup
+        window.addEventListener('beforeunload', () => {
+            if (metadataInterval) clearInterval(metadataInterval);
+        });
+    </script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 </body>
 </html>
