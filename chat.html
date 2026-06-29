@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RadioXatAnigosChile</title>
+<title>Radio | Chat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -93,21 +93,20 @@
     }
 
     .chat-header {
-        padding: 20px 24px;
+        padding: 20px;
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         border-bottom: 1px solid var(--glass-border);
         min-height: 80px;
         gap: 16px;
-        position: relative;
+        flex-wrap: wrap;
     }
 
     .chat-brand {
         display: flex;
         align-items: center;
         gap: 12px;
-        z-index: 1;
     }
 
     .chat-brand svg {
@@ -122,13 +121,6 @@
         font-weight: 700;
         color: var(--text);
         letter-spacing: -0.5px;
-    }
-
-    .chat-header-center {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 0;
     }
 
     .chat-content {
@@ -173,6 +165,7 @@
         box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
         position: relative;
         overflow: hidden;
+        white-space: nowrap;
     }
 
     .btn::before {
@@ -377,23 +370,6 @@
         transition: var(--transition);
     }
 
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--text-secondary);
-        padding: 12px 16px;
-        background: rgba(124, 58, 237, 0.08);
-        border-radius: 8px;
-        border: 1px solid rgba(124, 58, 237, 0.2);
-    }
-
-    .user-info strong {
-        color: var(--violet-light);
-        font-weight: 600;
-    }
-
     .hidden {
         display: none !important;
     }
@@ -427,17 +403,6 @@
         .chat-header {
             padding: 16px;
             min-height: 70px;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .chat-header-center {
-            position: static;
-            transform: none;
-            width: 100%;
-            display: flex;
-            justify-content: center;
         }
 
         .chat-brand-title {
@@ -474,7 +439,12 @@
         }
 
         .chat-header {
-            gap: 10px;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            font-size: 13px;
         }
     }
 </style>
@@ -489,9 +459,7 @@
                     </svg>
                     <span class="chat-brand-title">Chat Amigos Chile</span>
                 </div>
-                <div class="chat-header-center">
-                    <button id="connectBtn" class="btn">Conectar al Chat</button>
-                </div>
+                <button id="connectBtn" class="btn">Conectar al Chat</button>
             </div>
             <div class="chat-content" id="chatContent">
                 <div id="chatPlaceholder" class="chat-placeholder">
@@ -505,17 +473,6 @@
         </div>
 
         <div class="panel panel-right">
-            <div class="section">
-                <div class="section-title">Usuario</div>
-                <button id="changeNickBtn" class="btn btn-secondary" style="width: 100%;">Cambiar Nick</button>
-                <div id="userInfo" class="user-info hidden" style="margin-top: 12px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                    <span>Nick: <strong id="currentNick">Anónimo</strong></span>
-                </div>
-            </div>
-
             <div class="section">
                 <div class="section-title">Ahora Suena</div>
                 <div class="now-playing" id="nowPlaying">
@@ -569,19 +526,15 @@
         };
 
         // State
-        let currentNick = '';
         let chatConnected = false;
         let isPlaying = false;
         let metadataInterval = null;
 
         // Elements
         const connectBtn = document.getElementById('connectBtn');
-        const changeNickBtn = document.getElementById('changeNickBtn');
         const chatFrame = document.getElementById('chatFrame');
         const chatContent = document.getElementById('chatContent');
         const chatPlaceholder = document.getElementById('chatPlaceholder');
-        const userInfo = document.getElementById('userInfo');
-        const currentNickEl = document.getElementById('currentNick');
         const nowPlayingEl = document.getElementById('nowPlaying');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const playIcon = document.getElementById('playIcon');
@@ -590,12 +543,12 @@
         const radioPlayer = document.getElementById('radioPlayer');
 
         // Chat Functions
-        function buildChatUrl(nick) {
-            return `https://xat.com/embed/chat.php#id=${CHAT_CONFIG.id}&gn=${CHAT_CONFIG.groupName}&user=${encodeURIComponent(nick)}&k=${XAT_API_KEY}`;
+        function buildChatUrl() {
+            return `https://xat.com/embed/chat.php#id=${CHAT_CONFIG.id}&gn=${CHAT_CONFIG.groupName}&k=${XAT_API_KEY}`;
         }
 
         function connectChat() {
-            const url = buildChatUrl(currentNick || 'Invitado');
+            const url = buildChatUrl();
             chatFrame.src = url;
             chatFrame.style.display = 'block';
             chatPlaceholder.style.display = 'none';
@@ -618,27 +571,6 @@
                 disconnectChat();
             } else {
                 connectChat();
-            }
-        }
-
-        function changeNick() {
-            const newNick = prompt('Ingresa tu nuevo nick:', currentNick || '');
-            if (newNick !== null && newNick.trim() !== '') {
-                currentNick = newNick.trim();
-                currentNickEl.textContent = currentNick;
-                userInfo.classList.remove('hidden');
-                
-                if (chatConnected) {
-                    const oldFrame = document.getElementById('chatFrame');
-                    const newFrame = document.createElement('iframe');
-                    newFrame.id = 'chatFrame';
-                    newFrame.allowFullscreen = true;
-                    newFrame.style.width = '100%';
-                    newFrame.style.height = '100%';
-                    newFrame.style.border = 'none';
-                    newFrame.src = buildChatUrl(currentNick);
-                    oldFrame.parentNode.replaceChild(newFrame, oldFrame);
-                }
             }
         }
 
@@ -700,7 +632,6 @@
 
         // Event Listeners
         connectBtn.addEventListener('click', toggleChatConnection);
-        changeNickBtn.addEventListener('click', changeNick);
         playPauseBtn.addEventListener('click', togglePlayPause);
         volumeSlider.addEventListener('input', updateVolume);
 
